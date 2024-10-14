@@ -107,8 +107,8 @@ class Tetris {
 
         // if the piece can't advance, add it to the landed pile
         if (this.collision(currentPiece.getX(), nextY)) {
-            for (px = 0; px < 4; px++) {
-                for (py = 0; py < 4; py++) {
+            for (let px = 0; px < 4; px++) {
+                for (let py = 0; py < 4; py++) {
                     const row = currentPiece.getY() + py;
                     const column = currentPiece.getX() + px;
                     landed[row][column] = currentPiece.atPos[px][py];
@@ -135,8 +135,8 @@ class Tetris {
 
     collision = (x, y, r = this.currentPiece.getRotation()) => {
         const { currentPiece } = this;
-        for (px = 0; px < 4; px++) {
-            for (py = 0; py < 4; py++) {
+        for (let px = 0; px < 4; px++) {
+            for (let py = 0; py < 4; py++) {
                 let row = y + py;
                 let column = x + px;
                 if (currentPiece.atPos(px, py, r)) {
@@ -155,8 +155,8 @@ class Tetris {
         const { currentPiece, boardDisplay } = this;
         let startRow = currentPiece.getY() - 4;
         let startColumn = currentPiece.getX();
-        for (px = 0; px < 4; px++) {
-            for (py = 0; py < 4; py++) {
+        for (let px = 0; px < 4; px++) {
+            for (let py = 0; py < 4; py++) {
                 row = startRow + py;
                 column = startColumn + px;
                 color = currentPiece.atPos(px, py);
@@ -169,9 +169,18 @@ class Tetris {
 
     showNextPiece = () => {
         const { nextPieceDisplay, nextPiece } = this;
-        for (y = 0; y < 4; y++) {
-            for (x = 0; x < 4; x++) {
+        for (let y = 0; y < 4; y++) {
+            for (let x = 0; x < 4; x++) {
                 nextPieceDisplay.setCellColor(y, x, nextPiece.atPos(x, y));
+            }
+        }
+    }
+
+    drawLanded = () => {
+        const { rows, columns, boardDisplay, landed } = this;
+        for (let row = 0; row < rows; row++) {
+            for (let column = 0; column < columns; column++) {
+                boardDisplay.setCellColor(row - 4, column, landed[row][column]);
             }
         }
     }
