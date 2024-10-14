@@ -78,21 +78,29 @@ class Tetris {
     rows = 22;
     columns = 12;
     squareSize = 20;
+
     boardDisplay;
     nextPieceDisplay;
+    levelLabel;
+    scoreLabel;
 
     currentPiece = new Tetromino(this.getRandomType());
     nextPiece = new Tetromino(this.getRandomType());
 
     landed;
 
+    level = 1;
     score = 0;
 
+    timer;
 
-    constructor(boardDisplayParent, nextPieceDisplayParent) {
+
+    constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel) {
         const { rows, columns, squareSize } = this;
         this.boardDisplay = new SquareGrid(rows - 4, columns, squareSize, boardDisplayParent);
         this.nextPieceDisplay = new SquareGrid(4, 4, squareSize, nextPieceDisplayParent);
+        this.levelLabel = levelLabel;
+        this.scoreLabel = scoreLabel;
         // initialize the array of landed pieces
         this.landed = new Array(rows).fill(new Array(columns).fill(0));
     }
@@ -182,6 +190,67 @@ class Tetris {
             for (let column = 0; column < columns; column++) {
                 boardDisplay.setCellColor(row - 4, column, landed[row][column]);
             }
+        }
+    }
+
+    clearFilledLines = () => {
+        const { landed, rows, columns } = this;
+        let clearedLines = 0;
+
+        for (let row = rows - 1; row >= 0; row--) {
+            let isFilled = true;
+            for (let column = 0; column < columns; column++) {
+                if(!landed[row][column]) {
+                    isFilled = false;
+                    break;
+                }
+            }
+            if(isFilled) {
+                clearRow(row);
+                row += 1;
+                clearedLines += 1;
+            }
+        }
+
+        switch(clearedLines) {
+        case 1:
+            score += 100;
+            break;
+        case 2:
+            score += 300;
+            break;
+        case 3:
+            score += 500;
+            break;
+        case 4:
+            score += 800;
+        }
+
+        this.updateScore();
+        
+    }
+
+    updateScore = () => {
+        if (score >= 9000) {
+            this.level = 6;
+            clearInterval(this.timer);
+            this.timer = setInterval(this.tick, 1000);
+        } else if (score >= 6000) {
+            this.level = 5;
+            clearInterval(this.timer);
+            this.timer = setInterval(this.tick, 1500);
+        } else if (score >= 4500) {
+            this.level = 4;
+            clearInterval(this.timer);
+            this.timer = setInterval(this.tick, 2000);
+        } else if (score >= 3000) {
+            this.level = 3;
+            clearInterval(this.timer);
+            this.timer = setInterval(this.tick, 3000);
+        } else if (score >= 1500) {
+            this.level = 2;
+            clearInterval(this.timer);
+            this.timer = setInterval(this.tick, 4000);
         }
     }
 
