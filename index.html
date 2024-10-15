@@ -3,38 +3,59 @@
 <html>
 
   <head>
-    <title>SquareGrid demo</title>
+    <title>JS Tetris</title>
     <script src="../squaregrid/grid.js"></script>
-
+    <script src="tetris.js"></script>
+    <style>
+      .column {
+          float: left;
+          padding: 10px;
+      }
+      .left {
+          width: 50%;
+      }
+      .right {
+          width: 50%;
+      }
+      .row {
+      }
+      .row:after {
+          content: "";
+          display: table;
+          clear: both;
+      }
+      #game-over-label {
+          color: #ff0000;
+      }
+    </style>
   </head>
 
 
   <body>
-    <p>Click to colour a cell.</p>
-    <p>Alt+click to clear a cell.</p>
-    <div id="container"></div>
-    <script>
-      const myGrid = new SquareGrid(20, 10, 20, document.querySelector('#container'));
-      myGrid.setAlwaysDrawGrid(true);
-      myGrid.redraw();
-
-      myGrid.setOnClickCallback((row, column, {altKey}) => {
-          if (altKey) {
-              myGrid.clearCell(row, column);
-          } else {
-              myGrid.setCellColor(row, column, getRandomColor());    
-          }
+    <div id="container" class="row">
+      <div id="left-col" class="column left"></div>
+      <div id="right-col" class="column-right">
+        Next piece:
+        <div id="next-piece"></div>
+        <p id="score-label"></p>
+        <p id="level-label"></p>
+        <p id="game-over-label"></p>
+        <button id="new-game-button">Start new game</button>
+      </div>
+    </div>
+    <div>
+      <p>&larr; move left | &rarr; move right | &uarr; rotate</p>
+    </div>
     
-      });
-
-      function getRandomColor() {
-          const r = Math.floor(Math.random() * 256);
-          const g = Math.floor(Math.random() * 256);
-          const b = Math.floor(Math.random() * 256);
-          return `rgb(${r}, ${g}, ${b})`;
-      }
+    <script>
+      const game = new Tetris(document.querySelector('#left-col'),
+                              document.querySelector('#next-piece'),
+                              document.querySelector('#level-label'),
+                              document.querySelector('#score-label'),
+                              document.querySelector('#game-over-label'),
+                              document.querySelector('#new-game-button'));
     </script>
-    <script src="tetris.js"></script>
+
   </body>
   
 </html>

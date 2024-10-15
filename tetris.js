@@ -32,6 +32,7 @@ class Tetromino {
                 break;
             case 3:
                 n = 3 + 4 * px - py;
+                break;
             default:
                 n = px + 4 * py;
         }
@@ -94,6 +95,7 @@ class Tetris {
 
     level = 1;
     score = 0;
+    inGame = false;
 
     timer;
 
@@ -112,6 +114,12 @@ class Tetris {
         this.gameOverLabel = gameOverLabel;
         this.newGameButton = newGameButton;
 
+        document.body.addEventListener('keydown', (e) => {
+            if (this.inGame) {
+                this.keyPressed(e);
+            }
+        });
+
         this.newGameButton.addEventListener('click', () => {
             this.start();
         });
@@ -127,9 +135,40 @@ class Tetris {
 
     }
 
+    keyPressed = (e) => {
+        const { currentPiece, collision, boardDisplay } = this;
+        let nextX = currentPiece.getX();
+        let nextY = currentPiece.getY();
+        let nextRotation = currentPiece.getRotation();
+        if (e.key === "ArrowUp") {
+            nextRotation += 1;
+            if (!collision(nextX, nextY, nextRotation)) currentPiece.rotate();
+        } else if (e.key === "ArrowLeft") {
+            nextX -= 1;
+            if (!collision(nextX, nextY)) {
+                currentPiece.moveLeft();
+            }
+        } else if (e.key === "ArrowRight") {
+            nextX += 1;
+            if (!collision(nextX, nextY)) {
+                currentPiece.moveRight();
+            }
+        } else if (e.key === "ArrowDown") {
+            nextY += 1;
+            if (!collision(nextX, nextY)) {
+                currentPiece.advance();
+            }
+        }
+        boardDisplay.clearGrid();
+        this.drawLanded();
+        this.drawPiece();
+        boardDisplay.redraw();
+    }
+
     start = () => {
         this.score = 0;
         this.level = 1;
+        this.inGame = true;
         this.clearLanded();
         this.gameOverLabel.innerText = "";
         this.updateLabels();
@@ -153,7 +192,6 @@ class Tetris {
                 for (let py = 0; py < 4; py++) {
                     let row = currentPiece.getY() + py;
                     let column = currentPiece.getX() + px;
-                    console.log(row,column);
                     const color = currentPiece.atPos(px, py);
                     if (row < rows && column < columns && color) {
                         landed[row][column] = color;
@@ -181,14 +219,14 @@ class Tetris {
         return Math.floor(Math.random() * 7);
     }
 
-    collision = (x, y, r = this.currentPiece.getRotation()) => {
+    collision = (x, y, r = this.currentPiece.rotation) => {
         const { currentPiece, rows, columns, landed } = this;
         for (let px = 0; px < 4; px++) {
             for (let py = 0; py < 4; py++) {
                 let row = y + py;
                 let column = x + px;
                 if (currentPiece.atPos(px, py, r)) {
-                    if (row > rows - 1 || columns < 0 || column > (columns - 1)) {
+                    if (row > rows - 1 || column < 0 || column > (columns - 1)) {
                         return true;
                     } else if (landed[row][column]) {
                         return true;
@@ -248,24 +286,25 @@ class Tetris {
                 }
             }
             if(isFilled) {
-                clearRow(row);
+                this.clearRow(row);
                 row += 1;
                 clearedLines += 1;
             }
         }
 
+
         switch(clearedLines) {
         case 1:
-            score += 100;
+            this.score += 100;
             break;
         case 2:
-            score += 300;
+            this.score += 300;
             break;
         case 3:
-            score += 500;
+            this.score += 500;
             break;
         case 4:
-            score += 800;
+            this.score += 800;
         }
 
         this.updateScore();
@@ -315,11 +354,12 @@ class Tetris {
         const { gameOverLabel } = this;
         clearInterval(this.timer);
         gameOverLabel.innerText = "GAME OVER";
+        this.inGame = false;
         
     }
 
     clearRow(row) {
-        const { columns } = this;
+        const { columns, landed } = this;
         for (let r = row; r > 0; r--) {
             for (let c = 0; c < columns; c++) {
                 landed[r][c] = landed[r-1][c];
