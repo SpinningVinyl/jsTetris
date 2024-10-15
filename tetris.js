@@ -103,11 +103,13 @@ class Tetris {
     constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, gameOverLabel, newGameButton) {
         const { rows, columns, squareSize } = this;
         this.boardDisplay = new SquareGrid(rows - 4, columns, squareSize, boardDisplayParent);
-        this.boardDisplay.setAlwaysDrawGrid(true);
-        this.boardDisplay.setDefaultColor('#FFFFFF');
+        this.boardDisplay.setDefaultColor('#000000');
         this.boardDisplay.setGridColor('#000000');
         this.boardDisplay.setAutoRedraw(false);
         this.nextPieceDisplay = new SquareGrid(4, 4, squareSize, nextPieceDisplayParent);
+        this.nextPieceDisplay.setDefaultColor('#000000');
+        this.nextPieceDisplay.setGridColor(false);
+        
         
         this.levelLabel = levelLabel;
         this.scoreLabel = scoreLabel;
