@@ -112,7 +112,7 @@ class Tetris {
         this.gameOverLabel = gameOverLabel;
         this.newGameButton = newGameButton;
 
-        this.newGameButton.addEventListener('click', (e) => {
+        this.newGameButton.addEventListener('click', () => {
             this.start();
         });
     }
@@ -120,7 +120,10 @@ class Tetris {
     clearLanded = () => {
         const { rows, columns } = this;
         // initialize the array of landed pieces
-        this.landed = new Array(rows).fill(new Array(columns).fill(0));
+        this.landed = new Array(rows);
+        for (let row = 0; row < rows; row++) {
+            this.landed[row] = new Array(columns).fill(0);
+        }
 
     }
 
@@ -137,7 +140,7 @@ class Tetris {
     }
 
     tick = () => {
-        const { currentPiece, boardDisplay, landed } = this;
+        const { currentPiece, boardDisplay, landed, rows, columns } = this;
         this.clearFilledLines();
         this.drawLanded();
         this.drawPiece();
@@ -148,18 +151,22 @@ class Tetris {
         if (this.collision(currentPiece.getX(), nextY)) {
             for (let px = 0; px < 4; px++) {
                 for (let py = 0; py < 4; py++) {
-                    const row = currentPiece.getY() + py;
-                    console.log(row);
-                    const column = currentPiece.getX() + px;
-                    landed[row][column] = currentPiece.atPos(px, py);
+                    let row = currentPiece.getY() + py;
+                    let column = currentPiece.getX() + px;
+                    console.log(row,column);
+                    const color = currentPiece.atPos(px, py);
+                    if (row < rows && column < columns && color) {
+                        landed[row][column] = color;
+                    }
                 }
             }
             // if the landed piece is at the top edge or higher, game over
             if (currentPiece.getY() <= 4) {
                 this.gameOver();
+                boardDisplay.redraw();
                 return;
             } else {
-                this.currentPiece = new Tetromino(this.getRandomType());
+                this.currentPiece = this.nextPiece;
                 this.nextPiece = new Tetromino(this.getRandomType());
                 this.showNextPiece();
             }
@@ -201,7 +208,7 @@ class Tetris {
                 let row = startRow + py;
                 let column = startColumn + px;
                 let color = currentPiece.atPos(px, py);
-                if (row >= 0 && row < boardDisplay.getRows() && column >= 0 && column < boardDisplay.getColumns()) {
+                if (row >= 0 && row < boardDisplay.getRows() && column >= 0 && column < boardDisplay.getColumns() && color) {
                     boardDisplay.setCellColor(row, column, color);
                 }
             }
@@ -218,11 +225,12 @@ class Tetris {
     }
 
     drawLanded = () => {
-        const { columns, boardDisplay, landed } = this;
-        const rows = boardDisplay.getRows();
+        const { rows, columns, boardDisplay, landed } = this;
         for (let row = 0; row < rows; row++) {
             for (let column = 0; column < columns; column++) {
-                boardDisplay.setCellColor(row, column, landed[row][column]);
+                if (row >= 4) {
+                    boardDisplay.setCellColor(row - 4, column, landed[row][column]);
+                }
             }
         }
     }
