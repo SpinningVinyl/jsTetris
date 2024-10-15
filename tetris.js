@@ -104,7 +104,7 @@ class Tetris {
         const { rows, columns, squareSize } = this;
         this.boardDisplay = new SquareGrid(rows - 4, columns, squareSize, boardDisplayParent);
         this.boardDisplay.setDefaultColor('#000000');
-        this.boardDisplay.setGridColor('#000000');
+        this.boardDisplay.setGridColor(false);
         this.boardDisplay.setAutoRedraw(false);
         this.nextPieceDisplay = new SquareGrid(4, 4, squareSize, nextPieceDisplayParent);
         this.nextPieceDisplay.setDefaultColor('#000000');
@@ -182,6 +182,7 @@ class Tetris {
 
     tick = () => {
         const { currentPiece, boardDisplay, landed, rows, columns } = this;
+        boardDisplay.clearGrid();
         this.clearFilledLines();
         this.drawLanded();
         this.drawPiece();
