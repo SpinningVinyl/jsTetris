@@ -114,7 +114,12 @@ class Tetris {
     }
 
     start = () => {
-        
+        this.score = 0;
+        this.level = 1;
+        this.currentPiece = new Tetromino(this.getRandomType());
+        this.nextPiece = new Tetromino(this.getRandomType());
+        this.showNextPiece();
+        this.attachTimer(5000);
     }
 
     tick = () => {
