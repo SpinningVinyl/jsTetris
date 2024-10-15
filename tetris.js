@@ -83,9 +83,10 @@ class Tetris {
     nextPieceDisplay;
     levelLabel;
     scoreLabel;
+    newGameButton;
 
-    currentPiece = new Tetromino(this.getRandomType());
-    nextPiece = new Tetromino(this.getRandomType());
+    currentPiece;
+    nextPiece;
 
     landed;
 
@@ -95,14 +96,25 @@ class Tetris {
     timer;
 
 
-    constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel) {
+    constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, newGameButton) {
         const { rows, columns, squareSize } = this;
         this.boardDisplay = new SquareGrid(rows - 4, columns, squareSize, boardDisplayParent);
+        this.boardDisplay.setAlwaysDrawGrid(true);
+        this.boardDisplay.setDefaultColor('#FFFFFF');
+        this.boardDisplay.setGridColor('#000000');
+        this.boardDisplay.setAutoRedraw(false);
         this.nextPieceDisplay = new SquareGrid(4, 4, squareSize, nextPieceDisplayParent);
+        
         this.levelLabel = levelLabel;
         this.scoreLabel = scoreLabel;
+        this.newGameButton = newGameButton;
+        
         // initialize the array of landed pieces
         this.landed = new Array(rows).fill(new Array(columns).fill(0));
+    }
+
+    start = () => {
+        
     }
 
     tick = () => {
@@ -233,24 +245,35 @@ class Tetris {
     updateScore = () => {
         if (score >= 9000) {
             this.level = 6;
-            clearInterval(this.timer);
-            this.timer = setInterval(this.tick, 1000);
+            this.attachTimer(1000);
         } else if (score >= 6000) {
             this.level = 5;
-            clearInterval(this.timer);
-            this.timer = setInterval(this.tick, 1500);
+            this.attachTimer(1500);
         } else if (score >= 4500) {
             this.level = 4;
-            clearInterval(this.timer);
-            this.timer = setInterval(this.tick, 2000);
+            this.attachTimer(2000);
         } else if (score >= 3000) {
             this.level = 3;
-            clearInterval(this.timer);
-            this.timer = setInterval(this.tick, 3000);
+            this.attachTimer(3000);
         } else if (score >= 1500) {
             this.level = 2;
+            this.attachTimer(4000);
+        }
+    }
+
+    attachTimer = (millis) => {
+        if (this.timer) {
             clearInterval(this.timer);
-            this.timer = setInterval(this.tick, 4000);
+        }
+        this.timer = setInterval(this.tick, millis);
+    }
+
+    clearRow(row) {
+        const { columns } = this;
+        for (let r = row; r > 0; r--) {
+            for (let c = 0; c < columns; c++) {
+                landed[r][c] = landed[r-1][c];
+            }
         }
     }
 
