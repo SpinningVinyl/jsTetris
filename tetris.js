@@ -264,6 +264,7 @@ class Tetris {
             this.level = 2;
             this.attachTimer(4000);
         }
+        updateLabels();
     }
 
     attachTimer = (millis) => {
@@ -271,6 +272,12 @@ class Tetris {
             clearInterval(this.timer);
         }
         this.timer = setInterval(this.tick, millis);
+    }
+
+    updateLabels = () => {
+        const { levelLabel, scoreLabel } = this;
+        levelLabel.innerText = "Level: " + this.level;
+        scoreLabel.innerText = "Score: " + this.score;
     }
 
     clearRow(row) {
