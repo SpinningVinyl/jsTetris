@@ -1,6 +1,6 @@
 class Tetromino {
     rotation = 0;
-    type;
+    type = 0;
     x = 4;
     y = 0;
     tmino = ["0100010001000100",   // I-tetromino
@@ -16,6 +16,7 @@ class Tetromino {
         if (type < 0 || type > 6) {
             throw new Error("Wrong tetromino type.");
         }
+        this.type = type;
     }
 
     atPos = (px, py, r = this.rotation) => {
@@ -34,7 +35,7 @@ class Tetromino {
             default:
                 n = px + 4 * py;
         }
-        if (tmino[type][n] === '1') {
+        if (tmino[type].charAt(n) === '1') {
             return color[type];
         }
         return 0;
@@ -83,6 +84,7 @@ class Tetris {
     nextPieceDisplay;
     levelLabel;
     scoreLabel;
+    gameOverLabel;
     newGameButton;
 
     currentPiece;
@@ -96,7 +98,7 @@ class Tetris {
     timer;
 
 
-    constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, newGameButton) {
+    constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, gameOverLabel, newGameButton) {
         const { rows, columns, squareSize } = this;
         this.boardDisplay = new SquareGrid(rows - 4, columns, squareSize, boardDisplayParent);
         this.boardDisplay.setAlwaysDrawGrid(true);
@@ -107,41 +109,55 @@ class Tetris {
         
         this.levelLabel = levelLabel;
         this.scoreLabel = scoreLabel;
+        this.gameOverLabel = gameOverLabel;
         this.newGameButton = newGameButton;
-        
+
+        this.newGameButton.addEventListener('click', (e) => {
+            this.start();
+        });
+    }
+
+    clearLanded = () => {
+        const { rows, columns } = this;
         // initialize the array of landed pieces
         this.landed = new Array(rows).fill(new Array(columns).fill(0));
+
     }
 
     start = () => {
         this.score = 0;
         this.level = 1;
+        this.clearLanded();
+        this.gameOverLabel.innerText = "";
+        this.updateLabels();
         this.currentPiece = new Tetromino(this.getRandomType());
         this.nextPiece = new Tetromino(this.getRandomType());
         this.showNextPiece();
-        this.attachTimer(5000);
+        this.attachTimer(500);
     }
 
     tick = () => {
-        const { currentPiece, boardDisplay } = this;
+        const { currentPiece, boardDisplay, landed } = this;
         this.clearFilledLines();
         this.drawLanded();
         this.drawPiece();
 
-        nextY = currentPiece.getY() + 1;
+        let nextY = currentPiece.getY() + 1;
 
         // if the piece can't advance, add it to the landed pile
         if (this.collision(currentPiece.getX(), nextY)) {
             for (let px = 0; px < 4; px++) {
                 for (let py = 0; py < 4; py++) {
                     const row = currentPiece.getY() + py;
+                    console.log(row);
                     const column = currentPiece.getX() + px;
-                    landed[row][column] = currentPiece.atPos[px][py];
+                    landed[row][column] = currentPiece.atPos(px, py);
                 }
             }
             // if the landed piece is at the top edge or higher, game over
             if (currentPiece.getY() <= 4) {
                 this.gameOver();
+                return;
             } else {
                 this.currentPiece = new Tetromino(this.getRandomType());
                 this.nextPiece = new Tetromino(this.getRandomType());
@@ -155,11 +171,11 @@ class Tetris {
     }
 
     getRandomType = () => {
-        return Math.floor(Math.random * 8);
+        return Math.floor(Math.random() * 7);
     }
 
     collision = (x, y, r = this.currentPiece.getRotation()) => {
-        const { currentPiece } = this;
+        const { currentPiece, rows, columns, landed } = this;
         for (let px = 0; px < 4; px++) {
             for (let py = 0; py < 4; py++) {
                 let row = y + py;
@@ -182,9 +198,9 @@ class Tetris {
         let startColumn = currentPiece.getX();
         for (let px = 0; px < 4; px++) {
             for (let py = 0; py < 4; py++) {
-                row = startRow + py;
-                column = startColumn + px;
-                color = currentPiece.atPos(px, py);
+                let row = startRow + py;
+                let column = startColumn + px;
+                let color = currentPiece.atPos(px, py);
                 if (row >= 0 && row < boardDisplay.getRows() && column >= 0 && column < boardDisplay.getColumns()) {
                     boardDisplay.setCellColor(row, column, color);
                 }
@@ -202,10 +218,11 @@ class Tetris {
     }
 
     drawLanded = () => {
-        const { rows, columns, boardDisplay, landed } = this;
+        const { columns, boardDisplay, landed } = this;
+        const rows = boardDisplay.getRows();
         for (let row = 0; row < rows; row++) {
             for (let column = 0; column < columns; column++) {
-                boardDisplay.setCellColor(row - 4, column, landed[row][column]);
+                boardDisplay.setCellColor(row, column, landed[row][column]);
             }
         }
     }
@@ -248,36 +265,49 @@ class Tetris {
     }
 
     updateScore = () => {
+        const { score } = this;
         if (score >= 9000) {
             this.level = 6;
-            this.attachTimer(1000);
+            this.attachTimer(100);
         } else if (score >= 6000) {
             this.level = 5;
-            this.attachTimer(1500);
+            this.attachTimer(150);
         } else if (score >= 4500) {
             this.level = 4;
-            this.attachTimer(2000);
+            this.attachTimer(200);
         } else if (score >= 3000) {
             this.level = 3;
-            this.attachTimer(3000);
+            this.attachTimer(300);
         } else if (score >= 1500) {
             this.level = 2;
-            this.attachTimer(4000);
+            this.attachTimer(400);
         }
-        updateLabels();
+        this.updateLabels();
     }
 
     attachTimer = (millis) => {
+        this.clearTimer();
+        this.timer = setInterval(this.tick, millis);
+    }
+
+    clearTimer = () => {
         if (this.timer) {
             clearInterval(this.timer);
+            this.timer = null;
         }
-        this.timer = setInterval(this.tick, millis);
     }
 
     updateLabels = () => {
         const { levelLabel, scoreLabel } = this;
         levelLabel.innerText = "Level: " + this.level;
         scoreLabel.innerText = "Score: " + this.score;
+    }
+
+    gameOver = () => {
+        const { gameOverLabel } = this;
+        clearInterval(this.timer);
+        gameOverLabel.innerText = "GAME OVER";
+        
     }
 
     clearRow(row) {
