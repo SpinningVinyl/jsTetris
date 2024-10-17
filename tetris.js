@@ -316,18 +316,21 @@ class Tetris {
 
     updateScore = () => {
         const { score } = this;
-        if (score >= 9000) {
-            this.level = 6;
+        if (score >= 12000) {
+            this.level = 7;
             this.attachTimer(100);
+        } else if (score >= 9000) {
+            this.level = 6;
+            this.attachTimer(150);
         } else if (score >= 6000) {
             this.level = 5;
-            this.attachTimer(150);
+            this.attachTimer(200);
         } else if (score >= 4500) {
             this.level = 4;
-            this.attachTimer(200);
+            this.attachTimer(250);
         } else if (score >= 3000) {
             this.level = 3;
-            this.attachTimer(300);
+            this.attachTimer(350);
         } else if (score >= 1500) {
             this.level = 2;
             this.attachTimer(400);
