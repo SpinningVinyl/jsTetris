@@ -96,6 +96,8 @@ class Tetris {
     level = 1;
     score = 0;
     inGame = false;
+    pause = false;
+    timerInterval; 
 
     timer;
 
@@ -142,7 +144,15 @@ class Tetris {
         let nextX = currentPiece.getX();
         let nextY = currentPiece.getY();
         let nextRotation = currentPiece.getRotation();
-        if (e.key === "ArrowUp") {
+        if (e.key === " ") {
+            this.pause = !this.pause;
+            if (this.pause) {
+                this.clearTimer();
+            } else {
+                this.attachTimer(this.timerInterval);
+            }
+        } else if (!this.pause) {
+            if (e.key === "ArrowUp") {
             nextRotation += 1;
             if (!collision(nextX, nextY, nextRotation)) currentPiece.rotate();
         } else if (e.key === "ArrowLeft") {
@@ -161,6 +171,7 @@ class Tetris {
                 currentPiece.advance();
             }
         }
+        }
         boardDisplay.clearGrid();
         this.drawLanded();
         this.drawPiece();
@@ -178,6 +189,7 @@ class Tetris {
         this.nextPiece = new Tetromino(this.getRandomType());
         this.showNextPiece();
         this.attachTimer(500);
+        this.newGameButton.disabled = true;
     }
 
     tick = () => {
@@ -341,6 +353,7 @@ class Tetris {
     attachTimer = (millis) => {
         this.clearTimer();
         this.timer = setInterval(this.tick, millis);
+        this.timerInterval = millis;
     }
 
     clearTimer = () => {
@@ -361,6 +374,7 @@ class Tetris {
         clearInterval(this.timer);
         gameOverLabel.innerText = "GAME OVER";
         this.inGame = false;
+        this.newGameButton.disabled = false;
         
     }
 
