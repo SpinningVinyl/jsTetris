@@ -77,7 +77,7 @@ class Tetromino {
 
 class Tetris {
 
-    rows = 22;
+    rows = 26;
     columns = 12;
     squareSize = 20;
 
