@@ -19,6 +19,8 @@
       }
       .row {
           width: 540px;
+          margin-left: auto;
+          margin-right: auto;
       }
       .row:after {
           content: "";
@@ -27,6 +29,12 @@
       }
       #game-over-label {
           color: #ff0000;
+      }
+      #footer {
+          width: 540px;
+          padding-left: 10px;
+          margin-left: auto;
+          margin-right: auto;
       }
     </style>
   </head>
@@ -44,7 +52,7 @@
         <button id="new-game-button">Start new game</button>
       </div>
     </div>
-    <div>
+    <div id="footer">
       <p>&larr; move left | &rarr; move right | &uarr; rotate</p>
       <p>[Space] pause/unpause</p>
     </div>
