@@ -97,7 +97,7 @@ class Tetris {
     score = 0;
     inGame = false;
     pause = false;
-    timerInterval; 
+    timerInterval;
 
     timer;
 
@@ -217,18 +217,22 @@ class Tetris {
 
         // if the piece can't advance, add it to the landed pile
         if (this.collision(currentPiece.getX(), nextY)) {
+            let hasHiddenBlocks = false;
             for (let px = 0; px < 4; px++) {
                 for (let py = 0; py < 4; py++) {
-                    let row = currentPiece.getY() + py;
-                    let column = currentPiece.getX() + px;
+                    const row = currentPiece.getY() + py;
+                    const column = currentPiece.getX() + px;
                     const color = currentPiece.atPos(px, py);
-                    if (row < rows && column < columns && color) {
+                    if (color) {
                         landed[row][column] = color;
+                        if (row < 4) {
+                            hasHiddenBlocks = true;
+                        }
                     }
                 }
             }
             // if the landed piece is at the top edge or higher, game over
-            if (currentPiece.getY() <= 4) {
+            if (hasHiddenBlocks) {
                 this.gameOver();
                 boardDisplay.redraw();
                 return;
