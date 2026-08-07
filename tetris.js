@@ -174,13 +174,16 @@ class Tetris {
         let nextY = currentPiece.getY();
         let nextRotation = currentPiece.getRotation();
         if (e.key === " ") {
+            e.preventDefault();
+            if (e.repeat) {
+                return;
+            }
             this.pause = !this.pause;
             if (this.pause) {
                 this.clearTimer();
             } else {
                 this.attachTimer(this.timerInterval);
             }
-            e.preventDefault();
         } else if (!this.pause) {
             if (e.key === "ArrowUp") {
                 nextRotation += 1;
