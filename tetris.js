@@ -75,6 +75,28 @@ class Tetromino {
     }
 }
 
+class SevenBagRandomizer {
+    constructor() {
+        this.bag = [];
+    }
+
+    // Fisher-Yates shuffle
+    shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    getNext() {
+        if (this.bag.length === 0) {
+            this.bag = this.shuffle([0, 1, 2, 3, 4, 5, 6]);
+        }
+        return this.bag.pop();
+  }
+}
+
 class Tetris {
 
     rows = 26;
@@ -88,6 +110,7 @@ class Tetris {
     gameOverLabel;
     newGameButton;
 
+    randomizer;
     currentPiece;
     nextPiece;
 
@@ -193,6 +216,7 @@ class Tetris {
     }
 
     start = () => {
+        this.randomizer = new SevenBagRandomizer();
         this.score = 0;
         this.level = 1;
         this.inGame = true;
@@ -249,7 +273,7 @@ class Tetris {
     }
 
     getRandomType = () => {
-        return Math.floor(Math.random() * 7);
+        return this.randomizer.getNext();
     }
 
     collision = (x, y, r = this.currentPiece.rotation) => {
