@@ -4,12 +4,12 @@ class Tetromino {
     x = 4;
     y = 0;
     tmino = ["0100010001000100",   // I-tetromino
-        "0100011000100000",   // S-tetromino
-        "0000011001100000",   // O-tetromino
-        "0110010001000000",   // J-tetromino
-        "0010011001000000",   // Z-tetromino
-        "0110001000100000",   // L-tetromino
-        "0100111000000000"]; // T-tetromino
+             "0100011000100000",   // S-tetromino
+             "0000011001100000",   // O-tetromino
+             "0110010001000000",   // J-tetromino
+             "0010011001000000",   // Z-tetromino
+             "0110001000100000",   // L-tetromino
+             "0100111000000000"]; // T-tetromino
     color = ["cyan", "green", "yellow", "blue", "red", "orange", "magenta"];
 
     constructor(type) {
@@ -101,6 +101,13 @@ class Tetris {
 
     timer;
 
+    TIMER7 = 100;
+    TIMER6 = 150;
+    TIMER5 = 200;
+    TIMER4 = 250;
+    TIMER3 = 350;
+    TIMER2 = 400;
+    TIMER1 = 500;
 
     constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, gameOverLabel, newGameButton) {
         const { rows, columns, squareSize } = this;
@@ -151,26 +158,33 @@ class Tetris {
             } else {
                 this.attachTimer(this.timerInterval);
             }
+            e.preventDefault();
         } else if (!this.pause) {
             if (e.key === "ArrowUp") {
-            nextRotation += 1;
-            if (!collision(nextX, nextY, nextRotation)) currentPiece.rotate();
-        } else if (e.key === "ArrowLeft") {
-            nextX -= 1;
-            if (!collision(nextX, nextY)) {
-                currentPiece.moveLeft();
+                nextRotation += 1;
+                if (!collision(nextX, nextY, nextRotation)) {
+                    currentPiece.rotate();
+                }
+                e.preventDefault();
+            } else if (e.key === "ArrowLeft") {
+                nextX -= 1;
+                if (!collision(nextX, nextY)) {
+                    currentPiece.moveLeft();
+                }
+                e.preventDefault();
+            } else if (e.key === "ArrowRight") {
+                nextX += 1;
+                if (!collision(nextX, nextY)) {
+                    currentPiece.moveRight();
+                }
+                e.preventDefault();
+            } else if (e.key === "ArrowDown") {
+                nextY += 1;
+                if (!collision(nextX, nextY)) {
+                    currentPiece.advance();
+                }
+                e.preventDefault();
             }
-        } else if (e.key === "ArrowRight") {
-            nextX += 1;
-            if (!collision(nextX, nextY)) {
-                currentPiece.moveRight();
-            }
-        } else if (e.key === "ArrowDown") {
-            nextY += 1;
-            if (!collision(nextX, nextY)) {
-                currentPiece.advance();
-            }
-        }
         }
         boardDisplay.clearGrid();
         this.drawLanded();
@@ -188,7 +202,7 @@ class Tetris {
         this.currentPiece = new Tetromino(this.getRandomType());
         this.nextPiece = new Tetromino(this.getRandomType());
         this.showNextPiece();
-        this.attachTimer(500);
+        this.attachTimer(this.TIMER1);
         this.newGameButton.disabled = true;
     }
 
@@ -330,22 +344,34 @@ class Tetris {
         const { score } = this;
         if (score >= 12000) {
             this.level = 7;
-            this.attachTimer(100);
+            if (this.timerInterval != this.TIMER7) {
+                this.attachTimer(this.TIMER7);
+            }
         } else if (score >= 9000) {
             this.level = 6;
-            this.attachTimer(150);
+            if (this.timerInterval != this.TIMER6) {
+                this.attachTimer(this.TIMER6);
+            }
         } else if (score >= 6000) {
             this.level = 5;
-            this.attachTimer(200);
+            if (this.timerInterval != this.TIMER5) {
+                this.attachTimer(this.TIMER5);
+            }
         } else if (score >= 4500) {
             this.level = 4;
-            this.attachTimer(250);
+            if (this.timerInterval != this.TIMER4) {
+                this.attachTimer(this.TIMER4);
+            }
         } else if (score >= 3000) {
             this.level = 3;
-            this.attachTimer(350);
+            if (this.timerInterval != this.TIMER3) {
+                this.attachTimer(this.TIMER3);
+            }
         } else if (score >= 1500) {
             this.level = 2;
-            this.attachTimer(400);
+            if (this.timerInterval != this.TIMER2) {
+                this.attachTimer(this.TIMER2);
+            }
         }
         this.updateLabels();
     }
@@ -385,6 +411,7 @@ class Tetris {
                 landed[r][c] = landed[r-1][c];
             }
         }
+        landed[0].fill(0);
     }
 
 }
