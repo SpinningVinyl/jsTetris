@@ -168,11 +168,37 @@ class Tetris {
 
     }
 
+    rotateWithKick = () => {
+        const piece = this.currentPiece;
+        const nextRotation = piece.getRotation() + 1;
+
+        const kickOffsets = [
+            [0, 0],   // rotate in place
+            [-1, 0],  // one cell left
+            [1, 0],   // one cell right
+            [-2, 0],  // two cells left, mainly for I-piece
+            [2, 0]    // two cells right
+        ];
+
+        for (const [offsetX, offsetY] of kickOffsets) {
+            const nextX = piece.getX() + offsetX;
+            const nextY = piece.getY() + offsetY;
+
+            if (!this.collision(nextX, nextY, nextRotation)) {
+                piece.x = nextX;
+                piece.y = nextY;
+                piece.rotate();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     keyPressed = (e) => {
         const { currentPiece, collision, boardDisplay } = this;
         let nextX = currentPiece.getX();
         let nextY = currentPiece.getY();
-        let nextRotation = currentPiece.getRotation();
         if (e.key === " ") {
             e.preventDefault();
             if (e.repeat) {
@@ -186,10 +212,7 @@ class Tetris {
             }
         } else if (!this.pause) {
             if (e.key === "ArrowUp") {
-                nextRotation += 1;
-                if (!collision(nextX, nextY, nextRotation)) {
-                    currentPiece.rotate();
-                }
+                this.rotateWithKick();
                 e.preventDefault();
             } else if (e.key === "ArrowLeft") {
                 nextX -= 1;
