@@ -142,7 +142,6 @@ class Tetris {
         this.nextPieceDisplay.setDefaultColor('#000000');
         this.nextPieceDisplay.setGridColor(false);
         
-        
         this.levelLabel = levelLabel;
         this.scoreLabel = scoreLabel;
         this.gameOverLabel = gameOverLabel;
