@@ -126,6 +126,7 @@ class Tetris {
 
     timer;
 
+    TIMER8 = 75;
     TIMER7 = 125;
     TIMER6 = 150;
     TIMER5 = 200;
@@ -138,6 +139,8 @@ class Tetris {
     SCORE_2_LINES = 300;
     SCORE_3_LINES = 600;
     SCORE_4_LINES = 1000;
+
+    ROWS_PER_LEVEL = 12;
 
     constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, rowCounterLabel, gameOverLabel, newGameButton) {
         const { rows, columns, squareSize } = this;
@@ -387,6 +390,7 @@ class Tetris {
         }
 
         this.clearedRows += clearedLines;
+        this.level = Math.min(8, Math.floor(this.clearedRows / this.ROWS_PER_LEVEL) + 1);
         switch(clearedLines) {
         case 1:
             this.score += this.SCORE_1_LINE;
@@ -401,41 +405,53 @@ class Tetris {
             this.score += this.SCORE_4_LINES;
         }
 
-        this.updateScore();
+        this.updateTimers();
         
     }
 
-    updateScore = () => {
-        const { score } = this;
-        if (score >= 12000) {
-            this.level = 7;
-            if (this.timerInterval != this.TIMER7) {
-                this.attachTimer(this.TIMER7);
+    updateTimers = () => {
+        const { level,
+                timerInterval,
+                TIMER2,
+                TIMER3,
+                TIMER4,
+                TIMER5,
+                TIMER6,
+                TIMER7,
+                TIMER8 } = this;
+        if (level == 8) {
+            if (timerInterval != TIMER8) {
+                this.attachTimer(TIMER8);
             }
-        } else if (score >= 9000) {
-            this.level = 6;
-            if (this.timerInterval != this.TIMER6) {
-                this.attachTimer(this.TIMER6);
+        }
+        if (level == 7) {
+            if (timerInterval != TIMER7) {
+                this.attachTimer(TIMER7);
             }
-        } else if (score >= 6000) {
-            this.level = 5;
-            if (this.timerInterval != this.TIMER5) {
-                this.attachTimer(this.TIMER5);
+        }
+        if (level == 6) {
+            if (timerInterval != TIMER6) {
+                this.attachTimer(TIMER6);
             }
-        } else if (score >= 4500) {
-            this.level = 4;
-            if (this.timerInterval != this.TIMER4) {
-                this.attachTimer(this.TIMER4);
+        }
+        if (level == 5) {
+            if (timerInterval != TIMER5) {
+                this.attachTimer(TIMER5);
             }
-        } else if (score >= 3000) {
-            this.level = 3;
-            if (this.timerInterval != this.TIMER3) {
-                this.attachTimer(this.TIMER3);
+        }
+        if (level == 4) {
+            if (timerInterval != TIMER4) {
+                this.attachTimer(TIMER4);
             }
-        } else if (score >= 1500) {
-            this.level = 2;
-            if (this.timerInterval != this.TIMER2) {
-                this.attachTimer(this.TIMER2);
+        }
+        if (level == 3) {
+            if (timerInterval != TIMER3) {
+                this.attachTimer(TIMER3);
+            }
+        }
+        if (level == 2) {
+            if (timerInterval != TIMER2) {
+                this.attachTimer(TIMER2);
             }
         }
         this.updateLabels();
