@@ -107,6 +107,7 @@ class Tetris {
     nextPieceDisplay;
     levelLabel;
     scoreLabel;
+    rowCounterLabel;
     gameOverLabel;
     newGameButton;
 
@@ -118,13 +119,14 @@ class Tetris {
 
     level = 1;
     score = 0;
+    clearedRows = 0;
     inGame = false;
     pause = false;
     timerInterval;
 
     timer;
 
-    TIMER7 = 100;
+    TIMER7 = 125;
     TIMER6 = 150;
     TIMER5 = 200;
     TIMER4 = 250;
@@ -132,7 +134,12 @@ class Tetris {
     TIMER2 = 400;
     TIMER1 = 500;
 
-    constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, gameOverLabel, newGameButton) {
+    SCORE_1_LINE  = 100;
+    SCORE_2_LINES = 300;
+    SCORE_3_LINES = 600;
+    SCORE_4_LINES = 1000;
+
+    constructor(boardDisplayParent, nextPieceDisplayParent, levelLabel, scoreLabel, rowCounterLabel, gameOverLabel, newGameButton) {
         const { rows, columns, squareSize } = this;
         this.boardDisplay = new SquareGrid(rows - 4, columns, squareSize, boardDisplayParent);
         this.boardDisplay.setDefaultColor('#000000');
@@ -144,6 +151,7 @@ class Tetris {
         
         this.levelLabel = levelLabel;
         this.scoreLabel = scoreLabel;
+        this.rowCounterLabel = rowCounterLabel;
         this.gameOverLabel = gameOverLabel;
         this.newGameButton = newGameButton;
 
@@ -243,6 +251,7 @@ class Tetris {
     start = () => {
         this.randomizer = new SevenBagRandomizer();
         this.score = 0;
+        this.clearedRows = 0;
         this.level = 1;
         this.inGame = true;
         this.clearLanded();
@@ -374,19 +383,19 @@ class Tetris {
             }
         }
 
-
+        this.clearedRows += clearedLines;
         switch(clearedLines) {
         case 1:
-            this.score += 100;
+            this.score += this.SCORE_1_LINE;
             break;
         case 2:
-            this.score += 300;
+            this.score += this.SCORE_2_LINES;
             break;
         case 3:
-            this.score += 500;
+            this.score += this.SCORE_3_LINES;
             break;
         case 4:
-            this.score += 800;
+            this.score += this.SCORE_4_LINES;
         }
 
         this.updateScore();
@@ -443,9 +452,10 @@ class Tetris {
     }
 
     updateLabels = () => {
-        const { levelLabel, scoreLabel } = this;
+        const { levelLabel, scoreLabel, rowCounterLabel } = this;
         levelLabel.innerText = "Level: " + this.level;
         scoreLabel.innerText = "Score: " + this.score;
+        rowCounterLabel.innerText = "Rows cleared: " + this.clearedRows;
     }
 
     gameOver = () => {
