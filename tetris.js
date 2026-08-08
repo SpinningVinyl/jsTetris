@@ -158,6 +158,9 @@ class Tetris {
         document.body.addEventListener('keydown', (e) => {
             if (this.inGame) {
                 this.keyPressed(e);
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                this.start();
             }
         });
 
